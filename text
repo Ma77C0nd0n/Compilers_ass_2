@@ -1,0 +1,24 @@
+
+BExp    ::= BTerm BExp1
+BExp1   ::= and BTerm BExp1 | or BTerm BExp1 | epsilon
+BTerm   ::= BFactor | not BTerm
+BFactor ::= ( BExp ) | id | BConst | id = num | id > num | id < num
+BConst  ::= true | false
+
+LEFT FACTORING:
+
+BExp    ::= BTerm BExp1
+BExp1   ::= and BTerm BExp1 | or BTerm Bexp1 | epsilon
+BTerm   ::= BFactor | not BTerm
+BFactor ::= ( BExp ) | BConst | id BFactor1
+BFactor1 ::= = num | > num | < num | epsilon
+BConst  ::= true | false
+
+A  :: B A'
+A' :: and B A' | or B A' | e
+B  :: C | not B
+C  :: (A) | id | D | id = num | id > num | id < num
+D  :: true | false
+
+C  :: (A) | D | id C'
+C' :: = num | > num | < num | e
