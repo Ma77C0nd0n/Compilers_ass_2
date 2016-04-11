@@ -12,6 +12,7 @@ public class Parser {
     private ArrayList<ArrayList<Symbol>> token_list = new ArrayList<>();
     private ArrayList<Symbol> current_token = new ArrayList<>();
     private Grammar G = new Grammar();
+    private int RHS_tested = 0, RHS_success = 0, RHS_discard = 0;
 
     public Parser(String filename) {
         createPairs(filename);
@@ -20,16 +21,9 @@ public class Parser {
         create_tokens(terminal_hash);
         current_token = token_list.get(2);
         int i=0;
-        //Testing RDP
-//        for(ArrayList<Symbol> x : token_list) {
-//            current_token = x;
-//            i++;
-//            System.out.print("Result "+i+" is: ");
-//            System.out.println(RDP(new Symbol("S", 0, false), 0).getSuccess() ? "Success" : "Failure");
-//        }
 
         PredictiveParser Pred = new PredictiveParser(G);
-        System.out.println("\n\n"+Pred.PredictiveParse(current_token));
+//        System.out.println("\n\n"+Pred.PredictiveParse(current_token));
 
 //        ArrayList<Symbol> a = new ArrayList<>(Arrays.asList(new Symbol("S", 0, false)));
 //        for(Symbol x : Pred.FirstSet(a, G)) {
@@ -39,6 +33,10 @@ public class Parser {
 //            System.out.println(s.getStr());
 //        }
 //        test_production_fits_lang();
+    }
+
+    public ArrayList<ArrayList<Symbol>> getToken_list(){
+        return token_list;
     }
 
     private HashMap<Integer, String> get_terminals(){
@@ -59,15 +57,6 @@ public class Parser {
             i += j;
             symbolsList.add(new Symbol("$$$", 0, true));
             token_list.add(symbolsList);
-        }
-    }
-
-    private void test_token_list(){
-        for(ArrayList<Symbol> L : token_list){
-            for(Symbol S : L){
-                System.out.println(S.getStr() + " " + S.getValue());
-            }
-            System.out.println("\n");
         }
     }
 
@@ -105,21 +94,35 @@ public class Parser {
         return answer;
     }
 
+    public void testRDP(){
+        int i=0;
+        for(ArrayList<Symbol> x : token_list) {
+            current_token = x;
+            i++;
+            System.out.print("Result "+i+" is: ");
+            System.out.println(RDP(new Symbol("S", 0, false), 0).getSuccess() ? "Success" : "Failure");
+            System.out.println("RHS tested: " + RHS_tested);
+            System.out.println("RHS success: " + RHS_success);
+            System.out.println("RHS discarded: " + RHS_discard + "\n");
+            RHS_tested = 0; RHS_success = 0; RHS_discard = 0;
+        }
+    }
+
     //Recursive Descent Parser
-    public Result RDP(Symbol NT, int STARTPOS){
+    private Result RDP(Symbol NT, int STARTPOS){
         prodLoop:
         for(Production P : G.getGrammar()) {
 
             if (P.getLHS().getStr().equals(NT.getStr())) {
                 int NEXTPOS = STARTPOS;
                 for (Symbol SYM : P.getRHS()) {
-                    //RHS_tested number
+                    RHS_tested++;
                     if (SYM.isTerminal()) {
                         if (current_token.get(NEXTPOS).getStr().equals(SYM.getStr())) {
                             NEXTPOS++;
-                            //RHS_success number
+                            RHS_success++;
                         } else {
-                            //RHS_discard number
+                            RHS_discard++;
                             continue prodLoop;
                         }
                     } else {
@@ -151,9 +154,5 @@ public class Parser {
         }
         public boolean getSuccess(){ return success; }
         public int getPos(){ return pos; }
-    }
-
-    public static void main(String[] args) throws FileNotFoundException {
-        Parser a = new Parser("./Examples Assignment2 Correct Tokenised");
     }
 }

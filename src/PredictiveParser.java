@@ -196,9 +196,9 @@ public class PredictiveParser {
                     st.push(temp.pop());
                 T = st.peek();
 
-                for(Symbol s : st){
-                    System.out.println("* "+s.getStr()+" *");
-                }
+//                for(Symbol s : st){
+//                    System.out.println("* "+s.getStr()+" *");
+//                }
             }
         }
         return true;
